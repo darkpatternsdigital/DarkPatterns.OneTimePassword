@@ -1,0 +1,14 @@
+Dockerfile
+.dockerignore
+.git/
+
+.env
+.vs/
+.vscode/
+artifacts/
+*.local.*
+Server/wwwroot/**/*
+!Server/wwwroot/.gitkeep
+**/node_modules
+Ui/src/generated/
+Ui*/dev-dist/

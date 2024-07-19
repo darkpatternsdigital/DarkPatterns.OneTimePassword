@@ -1,0 +1,46 @@
+<Project>
+	<PropertyGroup>
+		<AnalysisMode>AllEnabledByDefault</AnalysisMode>
+		<CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+		<EnableNETAnalyzers>true</EnableNETAnalyzers>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<AnalysisLevel>latest-Recommended</AnalysisLevel>
+		<TreatWarningsAsErrors Condition=" '$(Configuration)' == 'Debug' ">true</TreatWarningsAsErrors>
+		<WarningsAsErrors Condition=" '$(Configuration)' == 'Debug' "/>
+
+		<!--
+			CA2007 - ConfigureAwait is not necessary in ASP.NET Core
+		 -->
+		<NoWarn>$(NoWarn);CA2007</NoWarn>
+	</PropertyGroup>
+
+	<!-- The following are test assembly supressions -->
+	<PropertyGroup Condition=" $(AssemblyName.EndsWith('.Tests')) ">
+		<!--
+			CA1001 - tests do not need to dispose everything
+		 -->
+		<NoWarn>$(NoWarn);CA1001</NoWarn>
+		<!--
+			CA1852 - allow unsealed classes in test assemblies
+		 -->
+		<NoWarn>$(NoWarn);CA1852</NoWarn>
+		<!--
+			CS8002 - allow test assemblies to reference assemblies without strong names
+		 -->
+		<NoWarn>$(NoWarn);CS8002</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<EditorConfigFiles Remove="$(SolutionRoot)**/*" />
+		<EditorConfigFiles Include="$(SolutionRoot).editorconfig" Visible="false" />
+	</ItemGroup>
+
+	<Target Name="_FormatSourceFiles"
+			Condition=" '$(Configuration)' == 'Debug' and '$(DisableAutoCodeFormat)' != 'true' "
+			BeforeTargets="BeforeBuild"
+			Inputs="@(Compile)"
+			Outputs="@(IntermediateAssembly)">
+		<Exec WorkingDirectory="$(ProjectDir)" Command="dotnet format &quot;$(ProjectPath)&quot;" />
+	</Target>
+
+</Project>
