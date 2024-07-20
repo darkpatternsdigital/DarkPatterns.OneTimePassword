@@ -1,0 +1,30 @@
+openapi: "3.0.3"
+info:
+  version: 1.0.0
+  title: One Time Password
+  description: Simple and Secure one time password (OTP) API, by Dark Patterns Digital
+paths:
+  /env:
+    summary: Gets the public API environment data
+    get:
+      operationId: getInfo
+      summary: Gets the public API environment data
+      responses:
+        200:
+          description:
+            Contains public environment info that is still useful for developers
+            when debugging issues
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - gitHash
+                  - tag
+                properties:
+                  gitHash:
+                    description: Git commit hash
+                    type: string
+                  tag:
+                    description: Build tag id
+                    type: string

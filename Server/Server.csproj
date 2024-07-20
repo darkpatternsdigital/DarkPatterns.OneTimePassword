@@ -6,4 +6,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="DarkPatterns.OpenApiCodegen.Server.Mvc" Version="0.17.0-local.6" />
+    <PackageReference Include="DarkPatterns.OpenApiCodegen.Json.Extensions" Version="0.17.0-local.6" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<OpenApiSchemaMvcServer Include="$(SolutionRoot)schemas\api.yaml" Link="Controllers\api.yaml" PathPrefix="/api" />
+	</ItemGroup>
 </Project>

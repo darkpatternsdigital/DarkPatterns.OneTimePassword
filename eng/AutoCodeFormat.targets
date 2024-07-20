@@ -12,6 +12,10 @@
 			CA2007 - ConfigureAwait is not necessary in ASP.NET Core
 		 -->
 		<NoWarn>$(NoWarn);CA2007</NoWarn>
+		<!--
+			ASP0014 - Using MVC rather than top-level routes
+		 -->
+		<NoWarn>$(NoWarn);ASP0014</NoWarn>
 	</PropertyGroup>
 
 	<!-- The following are test assembly supressions -->
