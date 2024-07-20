@@ -44,6 +44,9 @@ paths:
                 medium:
                   $ref: "#/components/schemas/Medium"
                 destination: { type: string }
+              required:
+              - medium
+              - destination
       responses:
         201:
           description: The OTP was delivered successfully
@@ -66,6 +69,10 @@ paths:
                   $ref: "#/components/schemas/Medium"
                 destination: { type: string }
                 otp: { type: string }
+              required:
+              - medium
+              - destination
+              - otp
       responses:
         200:
           description: The correct OTP was passed

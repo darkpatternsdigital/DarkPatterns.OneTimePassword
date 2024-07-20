@@ -17,4 +17,8 @@
 	<ItemGroup>
 		<OpenApiSchemaMvcServer Include="$(SolutionRoot)schemas\api.yaml" Link="Controllers\api.yaml" PathPrefix="/api" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Logic\" />
+	</ItemGroup>
 </Project>

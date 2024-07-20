@@ -1,12 +1,31 @@
 
 
 
+using DarkPatterns.OneTimePassword.Delivery;
+using DarkPatterns.OneTimePassword.Persistence;
+
 namespace DarkPatterns.OneTimePassword.Controllers;
 
-public class OtpVerifyController : OtpVerifyControllerBase
+public class OtpVerifyController(
+	IDeliveryMethodFactory deliveryMethodFactory,
+	OtpDbContext db
+) : OtpVerifyControllerBase
 {
-	protected override Task<VerifyOtpActionResult> VerifyOtp(VerifyOtpRequest verifyOtpBody)
+	protected override async Task<VerifyOtpActionResult> VerifyOtp(VerifyOtpRequest verifyOtpBody)
 	{
-		return Task.FromResult(VerifyOtpActionResult.BadRequest());
+		var deliveryMethod = deliveryMethodFactory.Create(verifyOtpBody.Medium);
+		if (!deliveryMethod.IsValidDestination(verifyOtpBody.Destination))
+			return VerifyOtpActionResult.BadRequest();
+
+		bool verifyResult = await db.VerifyOtpAsync(
+			verifyOtpBody.Medium,
+			verifyOtpBody.Destination,
+			verifyOtpBody.Otp
+		);
+
+		if (verifyResult)
+			return VerifyOtpActionResult.Ok();
+		else
+			return VerifyOtpActionResult.Conflict();
 	}
 }
