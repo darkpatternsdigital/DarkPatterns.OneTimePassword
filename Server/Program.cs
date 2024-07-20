@@ -1,3 +1,4 @@
+using DarkPatterns.OneTimePassword.Auth;
 using DarkPatterns.OneTimePassword.Environment;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +9,7 @@ builder.Services.RegisterEnvironment(
 	buildConfig: builder.Configuration.GetSection("build"),
 	dataProtectionConfig: builder.Configuration.GetSection("DataProtection")
 );
+builder.Services.RegisterAuth();
 
 var app = builder.Build();
 

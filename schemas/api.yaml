@@ -28,3 +28,61 @@ paths:
                   tag:
                     description: Build tag id
                     type: string
+  /otp:
+    post:
+      operationId: sendOtp
+      description: Send an OTP to a destination
+      security:
+        - LicensedApp: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                medium:
+                  $ref: "#/components/schemas/Medium"
+                destination: { type: string }
+      responses:
+        201:
+          description: The OTP was delivered successfully
+        400:
+          description: The destination was invalid or could not be delivered to
+  /otp/verify:
+    post:
+      operationId: verifyOtp
+      description: Verify an OTP sent to a destination
+      security:
+        - LicensedApp: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                medium:
+                  $ref: "#/components/schemas/Medium"
+                destination: { type: string }
+                otp: { type: string }
+      responses:
+        200:
+          description: The correct OTP was passed
+        400:
+          description: The destination was invalid
+        409:
+          description: The incorrect OTP was passed, or was not associated with the destination
+components:
+  schemas:
+    Medium:
+      type: string
+      enum:
+        - sms
+        - email
+        - voice
+  securitySchemes:
+    LicensedApp:
+      type: apiKey
+      in: header
+      name: x-api-key
