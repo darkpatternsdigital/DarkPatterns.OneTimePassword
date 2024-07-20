@@ -10,8 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DarkPatterns.OpenApiCodegen.Server.Mvc" Version="0.17.0-local.6" />
-    <PackageReference Include="DarkPatterns.OpenApiCodegen.Json.Extensions" Version="0.17.0-local.6" />
+    <PackageReference Include="DarkPatterns.OpenApiCodegen.Server.Mvc" Version="0.17.1" />
+    <PackageReference Include="DarkPatterns.OpenApiCodegen.Json.Extensions" Version="0.17.1" />
   </ItemGroup>
 
 	<ItemGroup>
