@@ -1,4 +1,5 @@
 using DarkPatterns.OneTimePassword.Auth;
+using DarkPatterns.OneTimePassword.Delivery;
 using DarkPatterns.OneTimePassword.Environment;
 using DarkPatterns.OneTimePassword.Logic;
 using DarkPatterns.OneTimePassword.Persistence;
@@ -14,6 +15,7 @@ builder.Services.RegisterEnvironment(
 	dataProtectionConfig: builder.Configuration.GetSection("DataProtection")
 );
 builder.Services.RegisterAuth();
+builder.Services.RegisterDelivery();
 builder.Services.RegisterLogic();
 if (builder.Configuration["Postgres:ConnectionString"] is string psqlConnectionString)
 	builder.Services.RegisterNpgsqlPersistence(psqlConnectionString);
