@@ -1,4 +1,4 @@
-using DarkPatterns.OneTimePassword.Api;
+using DarkPatterns.OneTimePassword.Client;
 using DarkPatterns.OneTimePassword.Delivery;
 using DarkPatterns.OneTimePassword.Logic;
 using DarkPatterns.OneTimePassword.Persistence;
@@ -15,9 +15,9 @@ namespace DarkPatterns.OneTimePassword.Tests;
 
 public class OtpControllerShould
 {
-	private static HttpClient ConfigureApplication(Controllers.Medium medium, string destination)
+	private static HttpClient ConfigureApplication(Medium apiMedium, string destination, string otp, out Func<OtpDbContext> db)
 	{
-		var otp = "123456";
+		var medium = (Controllers.Medium)apiMedium;
 		var mockDeliveryMethodFactory = new Mock<IDeliveryMethodFactory>(MockBehavior.Strict);
 		var mockOtpGenerator = new Mock<IOtpGenerator>(MockBehavior.Strict);
 
@@ -26,7 +26,7 @@ public class OtpControllerShould
 		mockDeliveryMethodFactory.Setup(m => m.Create(medium).SendOtpAsync(destination, otp)).ReturnsAsync(true);
 
 		var webApplicationFactory = BaseWebApplicationFactory.Create()
-			.WithDatabase()
+			.WithDatabase(out db)
 			.WithWebHostBuilder(web =>
 			{
 				web.ConfigureTestServices(svc =>
@@ -44,9 +44,16 @@ public class OtpControllerShould
 	public async Task Provide_an_otp_given_valid_configurations()
 	{
 		// Arrange
+		var applicationId = Guid.Empty;
 		var medium = Medium.Sms;
 		var destination = "+15554545544";
-		var client = ConfigureApplication((Controllers.Medium)medium, destination);
+		var otp = "123456";
+		var client = ConfigureApplication(
+			apiMedium: medium,
+			destination: destination,
+			otp: otp,
+			db: out var createDb
+		);
 
 		// Act
 		var response = await client.SendOtp(new(medium, destination));
@@ -55,5 +62,14 @@ public class OtpControllerShould
 		var result = await response.Response.Content.ReadAsStringAsync();
 		response.Response.EnsureSuccessStatusCode(); // Status Code 200-299
 		Assert.IsType<Operations.SendOtpReturnType.Created>(response);
+
+		using var db = createDb();
+		var deliveredRecord = db.DeliveredPasswords.SingleOrDefault(
+			x => x.ApplicationId == applicationId
+			&& x.MediumCode == OtpDbContextExtensions.ToMediumCode((Controllers.Medium)medium)
+			&& x.DeliveryTarget == destination
+		);
+		Assert.NotNull(deliveredRecord);
+		Assert.True(OtpDbContextExtensions.VerifyHash(deliveredRecord.PasswordHash, otp));
 	}
 }

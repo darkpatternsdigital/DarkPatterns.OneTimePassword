@@ -25,7 +25,7 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<OpenApiSchemaClient Include="..\schemas\api.yaml" Link="Api\api.yaml" />
+		<OpenApiSchemaClient Include="..\schemas\api.yaml" Link="Client\api.yaml" />
 	</ItemGroup>
 
   <ItemGroup>

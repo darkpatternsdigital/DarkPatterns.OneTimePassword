@@ -1,4 +1,4 @@
-using DarkPatterns.OneTimePassword.Api;
+using DarkPatterns.OneTimePassword.Client;
 using DarkPatterns.OneTimePassword.TestUtils;
 
 namespace DarkPatterns.OneTimePassword.Tests;
@@ -10,7 +10,7 @@ public class EnvironmentControllerShould
 	{
 		// Arrange
 		var client = BaseWebApplicationFactory.Create()
-			.WithDatabase()
+			.WithDatabase(out _)
 			.CreateApiClient(apiKey: null);
 
 		// Act

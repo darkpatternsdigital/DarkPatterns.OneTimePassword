@@ -29,18 +29,14 @@ internal static class BaseWebApplicationFactory
 
 	internal static WebApplicationFactory<Program> WithDatabase(
 		this WebApplicationFactory<Program> factory,
-		Action<OtpDbContext>? dbAction = null
+		out Func<OtpDbContext> createDatabase
 	)
 	{
 		var builder = new DbContextOptionsBuilder<OtpDbContext>();
 		builder.UseInMemoryDatabase(databaseName: "OtpDbInMemory");
 
 		var dbContextOptions = builder.Options;
-		if (dbAction != null)
-		{
-			using var db = new OtpDbContext(dbContextOptions);
-			dbAction(db);
-		}
+		createDatabase = () => new OtpDbContext(dbContextOptions);
 
 		return factory
 			.WithWebHostBuilder(web =>
