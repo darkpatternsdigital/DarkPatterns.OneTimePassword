@@ -8,11 +8,13 @@ public static class OtpDbContextExtensions
 {
 	internal static Task PersistOtpAsync(this OtpDbContext db, Medium medium, string destination, string otp)
 	{
-		throw new NotImplementedException();
+		// TODO
+		return Task.CompletedTask;
 	}
 
 	internal static Task<bool> VerifyOtpAsync(this OtpDbContext db, Medium medium, string destination, string otp)
 	{
-		throw new NotImplementedException();
+		// TODO
+		return Task.FromResult(false);
 	}
 }

@@ -5,15 +5,12 @@ namespace DarkPatterns.OneTimePassword.Tests;
 
 public class EnvironmentControllerShould
 {
-	private readonly BaseWebApplicationFactory webApplicationFactory = new();
-
 	[Fact]
 	public async Task Provide_environment_details()
 	{
 		// Arrange
-		var client = webApplicationFactory
-			.CreateClient();
-		client.BaseAddress = new Uri(client.BaseAddress!, "/api/");
+		var client = BaseWebApplicationFactory.Create()
+			.CreateApiClient(apiKey: null);
 
 		// Act
 		var response = await client.GetEnvironmentInfo();

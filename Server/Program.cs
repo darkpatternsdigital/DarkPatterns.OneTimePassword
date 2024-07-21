@@ -13,6 +13,9 @@ builder.Services.RegisterAuth();
 
 var app = builder.Build();
 
+if (!builder.Environment.IsProduction())
+	app.UseDeveloperExceptionPage();
+
 app.UseHealthChecks("/health");
 
 app.UseForwardedHeaders();
