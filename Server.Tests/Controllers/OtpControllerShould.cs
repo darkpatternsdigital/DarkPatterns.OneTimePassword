@@ -20,20 +20,19 @@ public class OtpControllerShould
 		var otp = "123456";
 		var mockDeliveryMethodFactory = new Mock<IDeliveryMethodFactory>(MockBehavior.Strict);
 		var mockOtpGenerator = new Mock<IOtpGenerator>(MockBehavior.Strict);
-		var mockOtpContext = new Mock<OtpDbContext>(MockBehavior.Strict);
 
 		mockDeliveryMethodFactory.Setup(m => m.Create(medium).IsValidDestination(destination)).Returns(true);
 		mockOtpGenerator.Setup(m => m.GenerateOtp()).Returns(otp);
 		mockDeliveryMethodFactory.Setup(m => m.Create(medium).SendOtpAsync(destination, otp)).ReturnsAsync(true);
 
 		var webApplicationFactory = BaseWebApplicationFactory.Create()
+			.WithDatabase()
 			.WithWebHostBuilder(web =>
 			{
 				web.ConfigureTestServices(svc =>
 				{
 					svc.AddSingleton(mockDeliveryMethodFactory.Object);
 					svc.AddSingleton(mockOtpGenerator.Object);
-					svc.AddSingleton(mockOtpContext.Object);
 				});
 			});
 

@@ -10,15 +10,28 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DarkPatterns.OpenApiCodegen.Server.Mvc" Version="0.17.1" />
+    <PackageReference Include="DarkPatterns.OpenApiCodegen.Server.Mvc" Version="0.17.1" PrivateAssets="all" />
     <PackageReference Include="DarkPatterns.OpenApiCodegen.Json.Extensions" Version="0.17.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
   </ItemGroup>
+
+  <Import Project="obj/Server.csproj.EntityFrameworkCore.targets"
+          Condition="exists('$(MSBuildThisFileDirectory)obj/Server.csproj.EntityFrameworkCore.targets')" />
 
 	<ItemGroup>
 		<OpenApiSchemaMvcServer Include="$(SolutionRoot)schemas\api.yaml" Link="Controllers\api.yaml" PathPrefix="/api" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Logic\" />
-	</ItemGroup>
+	<Target Name="SetupDockerCompose" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
+			<Exec Command="docker ps" ContinueOnError="true" EchoOff="true" StandardOutputImportance="low" StandardErrorImportance="low">
+			<Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+		</Exec>
+		<Message Condition="'$(ErrorCode)' != '0'" Text="The docker runtime was not started." />
+			<Exec WorkingDirectory="$(SolutionRoot)/eng/db" Command="docker-compose up -d" ContinueOnError="true" Condition="'$(ErrorCode)' == '0'" />
+	</Target>
 </Project>

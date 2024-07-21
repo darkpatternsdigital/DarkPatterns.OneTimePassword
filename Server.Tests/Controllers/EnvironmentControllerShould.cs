@@ -10,6 +10,7 @@ public class EnvironmentControllerShould
 	{
 		// Arrange
 		var client = BaseWebApplicationFactory.Create()
+			.WithDatabase()
 			.CreateApiClient(apiKey: null);
 
 		// Act

@@ -1,5 +1,8 @@
 using DarkPatterns.OneTimePassword.Auth;
 using DarkPatterns.OneTimePassword.Environment;
+using DarkPatterns.OneTimePassword.Persistence;
+
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +13,8 @@ builder.Services.RegisterEnvironment(
 	dataProtectionConfig: builder.Configuration.GetSection("DataProtection")
 );
 builder.Services.RegisterAuth();
+if (builder.Configuration["Postgres:ConnectionString"] is string psqlConnectionString)
+	builder.Services.RegisterNpgsqlPersistence(psqlConnectionString);
 
 var app = builder.Build();
 
@@ -30,5 +35,15 @@ app.UseEndpoints(endpoints =>
 {
 	endpoints.MapControllers();
 });
+
+if (args.Contains("--ef-migrate"))
+{
+	await StartupUtils.RunMigrations(app.Services);
+	return;
+}
+if (args.Contains("--ef-verify"))
+{
+	await StartupUtils.CheckMigrations(app.Services);
+}
 
 app.Run();

@@ -1,8 +1,10 @@
-
-using DarkPatterns.OneTimePassword.Controllers;
+using Microsoft.EntityFrameworkCore;
 
 namespace DarkPatterns.OneTimePassword.Persistence;
 
-public class OtpDbContext
+public class OtpDbContext : DbContext
 {
+	public OtpDbContext(DbContextOptions options) : base(options)
+	{
+	}
 }
