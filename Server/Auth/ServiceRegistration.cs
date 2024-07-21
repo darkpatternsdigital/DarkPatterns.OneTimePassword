@@ -1,7 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
+
 namespace DarkPatterns.OneTimePassword.Auth;
 
 public static class ServiceRegistration
 {
+	private const string ApiKeyAuthenticationScheme = "api-key-scheme";
+
 	internal static void RegisterAuth(this IServiceCollection services)
 	{
 		/* Authentication and Authorization in ASP.NET is built into a series of
@@ -35,17 +39,23 @@ public static class ServiceRegistration
 		 * any credentials.
 		 * */
 
+		services.AddAuthentication(options =>
+		{
+			options.AddScheme(ApiKeyAuthenticationScheme, schemeBuilder =>
+			{
+				schemeBuilder.HandlerType = typeof(ApiKeyScheme);
+			});
+		});
+
 		services.AddAuthorization(options =>
 		{
 			options.AddPolicy("LicensedApp", builder =>
 			{
-				// TODO: Verify x-api-key Header
-				// This "always allowed" requirement satisfies ASP.Net's
-				// requirement of having at least one assertion for a policy
-				builder.RequireAssertion(context => true);
+				builder.AddAuthenticationSchemes(ApiKeyAuthenticationScheme);
+				builder.RequireAuthenticatedUser();
 			});
 		});
-
 	}
 
 }
+
