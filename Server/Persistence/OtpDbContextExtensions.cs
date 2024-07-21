@@ -17,7 +17,7 @@ public static class OtpDbContextExtensions
 				&& pw.DeliveryTarget == destination
 			);
 
-		var newPasswordHash = GeneratePasswordHash(otp);
+		var newPasswordHash = PasswordHashing.GeneratePasswordHash(otp);
 		if (previous != null)
 		{
 			previous.PasswordHash = newPasswordHash;
@@ -29,22 +29,10 @@ public static class OtpDbContextExtensions
 				ApplicationId = Guid.Empty, // TODO
 				MediumCode = medium.ToMediumCode(),
 				DeliveryTarget = destination,
-				PasswordHash = GeneratePasswordHash(otp)
+				PasswordHash = PasswordHashing.GeneratePasswordHash(otp)
 			});
 		}
 		await db.SaveChangesAsync();
-	}
-
-	public static byte[] GeneratePasswordHash(this string otp)
-	{
-		// TODO
-		return Array.Empty<byte>();
-	}
-
-	internal static bool VerifyHash(byte[] passwordHash, string otp)
-	{
-		// TODO
-		return true;
 	}
 
 	public static string ToMediumCode(this Medium medium) =>
@@ -65,7 +53,7 @@ public static class OtpDbContextExtensions
 		);
 		if (deliveredRecord == null)
 			return false;
-		var isMatch = VerifyHash(deliveredRecord.PasswordHash, otp);
+		var isMatch = PasswordHashing.VerifyHash(deliveredRecord.PasswordHash, otp);
 		if (isMatch)
 		{
 			db.Remove(deliveredRecord);

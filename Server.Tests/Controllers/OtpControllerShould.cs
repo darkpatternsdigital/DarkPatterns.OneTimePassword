@@ -76,7 +76,7 @@ public class OtpControllerShould : IDisposable
 			&& x.DeliveryTarget == destination
 		);
 		Assert.NotNull(deliveredRecord);
-		Assert.True(OtpDbContextExtensions.VerifyHash(deliveredRecord.PasswordHash, otp));
+		Assert.True(PasswordHashing.VerifyHash(deliveredRecord.PasswordHash, otp));
 	}
 
 	public void Dispose()

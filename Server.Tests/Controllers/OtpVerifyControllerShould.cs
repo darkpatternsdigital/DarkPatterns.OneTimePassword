@@ -44,7 +44,7 @@ public class OtpVerifyControllerShould : IDisposable
 				ApplicationId = Guid.Empty, // TODO
 				MediumCode = medium.ToMediumCode(),
 				DeliveryTarget = destination,
-				PasswordHash = OtpDbContextExtensions.GeneratePasswordHash(otp),
+				PasswordHash = PasswordHashing.GeneratePasswordHash(otp),
 			});
 			await db.SaveChangesAsync();
 		}
