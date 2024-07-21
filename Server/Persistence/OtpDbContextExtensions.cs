@@ -46,7 +46,7 @@ public static class OtpDbContextExtensions
 
 	internal static async Task<bool> VerifyOtpAsync(this OtpDbContext db, Medium medium, string destination, string otp)
 	{
-		var deliveredRecord = await db.DeliveredPasswords.SingleOrDefaultAsync(
+		var deliveredRecord = await db.DeliveredPasswords.FirstOrDefaultAsync(
 			x => x.ApplicationId == Guid.Empty // TODO
 			&& x.MediumCode == ToMediumCode(medium)
 			&& x.DeliveryTarget == destination

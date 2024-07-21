@@ -7,13 +7,13 @@ internal class LoggingOnlyDeliveryMethod(Medium medium, ILogger<LoggingOnlyDeliv
 {
 	public bool IsValidDestination(string destination)
 	{
-		logger.LogIsValidDestination(medium.ToString("g"), destination);
+		logger.LogIsValidDestination(medium, destination);
 		return true;
 	}
 
 	public Task<bool> SendOtpAsync(string destination, string otp)
 	{
-		logger.LogSendOtp(medium.ToString("g"), destination, otp);
+		logger.LogSendOtp(medium, destination, otp);
 		return Task.FromResult(true);
 	}
 }
