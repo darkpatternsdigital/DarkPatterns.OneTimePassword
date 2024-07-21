@@ -3,14 +3,26 @@ using DarkPatterns.OneTimePassword.TestUtils;
 
 namespace DarkPatterns.OneTimePassword.Tests;
 
-public class EnvironmentControllerShould
+public class EnvironmentControllerShould : IDisposable
 {
+	private readonly DbFixture fixture;
+
+	public EnvironmentControllerShould()
+	{
+		this.fixture = new DbFixture();
+	}
+
+	public void Dispose()
+	{
+		((IDisposable)fixture).Dispose();
+	}
+
 	[Fact]
 	public async Task Provide_environment_details()
 	{
 		// Arrange
 		var client = BaseWebApplicationFactory.Create()
-			.WithDatabase(out _)
+			.WithDatabase(fixture)
 			.CreateApiClient(apiKey: null);
 
 		// Act

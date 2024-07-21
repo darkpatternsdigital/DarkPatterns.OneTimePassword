@@ -4,7 +4,9 @@ using DarkPatterns.OneTimePassword.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
@@ -29,23 +31,26 @@ internal static class BaseWebApplicationFactory
 
 	internal static WebApplicationFactory<Program> WithDatabase(
 		this WebApplicationFactory<Program> factory,
-		out Func<OtpDbContext> createDatabase
+		DbFixture fixture
 	)
 	{
-		var builder = new DbContextOptionsBuilder<OtpDbContext>();
-		builder.UseInMemoryDatabase(databaseName: "OtpDbInMemory");
-
-		var dbContextOptions = builder.Options;
-		createDatabase = () => new OtpDbContext(dbContextOptions);
-
-		return factory
+		var resultFactory = factory
 			.WithWebHostBuilder(web =>
 			{
 				web.ConfigureTestServices(svc =>
 				{
-					svc.AddScoped(sp => new OtpDbContext(dbContextOptions));
+					svc.AddDbContext<OtpDbContext>((options) =>
+					{
+						options.UseSqlite(fixture.Connection);
+					});
 				});
 			});
+
+		using var db = new OtpDbContext(fixture.ContextOptions);
+		db.Database.EnsureDeleted();
+		db.Database.EnsureCreated();
+
+		return resultFactory;
 	}
 
 	internal static HttpClient CreateApiClient(this WebApplicationFactory<Program> factory, string? apiKey)

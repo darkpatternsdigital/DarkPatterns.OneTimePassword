@@ -56,10 +56,26 @@ public static class OtpDbContextExtensions
 			_ => throw new InvalidOperationException("Unknown medium")
 		};
 
-	internal static Task<bool> VerifyOtpAsync(this OtpDbContext db, Medium medium, string destination, string otp)
+	internal static async Task<bool> VerifyOtpAsync(this OtpDbContext db, Medium medium, string destination, string otp)
 	{
-		// TODO
-		return Task.FromResult(false);
+		var deliveredRecord = await db.DeliveredPasswords.SingleOrDefaultAsync(
+			x => x.ApplicationId == Guid.Empty // TODO
+			&& x.MediumCode == ToMediumCode(medium)
+			&& x.DeliveryTarget == destination
+		);
+		if (deliveredRecord == null)
+			return false;
+		var isMatch = VerifyHash(deliveredRecord.PasswordHash, otp);
+		if (isMatch)
+		{
+			db.Remove(deliveredRecord);
+			await db.SaveChangesAsync();
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 }

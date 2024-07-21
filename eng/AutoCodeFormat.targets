@@ -25,6 +25,14 @@
 		 -->
 		<NoWarn>$(NoWarn);CA1001</NoWarn>
 		<!--
+			CA1816 - keep disposing simple - do not require GC supression for performance
+		 -->
+		<NoWarn>$(NoWarn);CA1816</NoWarn>
+		<!--
+			CA1707 - Test names may have underscores
+		 -->
+		<NoWarn>$(NoWarn);CA1707</NoWarn>
+		<!--
 			CA1852 - allow unsealed classes in test assemblies
 		 -->
 		<NoWarn>$(NoWarn);CA1852</NoWarn>
