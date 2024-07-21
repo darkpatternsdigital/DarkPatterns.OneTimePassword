@@ -32,6 +32,10 @@
 			CS8002 - allow test assemblies to reference assemblies without strong names
 		 -->
 		<NoWarn>$(NoWarn);CS8002</NoWarn>
+		<!--
+			CA1707 - Test names may have underscores
+		 -->
+		<NoWarn>$(NoWarn);CA1707</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>

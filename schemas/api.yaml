@@ -7,7 +7,7 @@ paths:
   /env:
     summary: Gets the public API environment data
     get:
-      operationId: getInfo
+      operationId: getEnvironmentInfo
       summary: Gets the public API environment data
       responses:
         200:

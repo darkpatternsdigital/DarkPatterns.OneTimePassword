@@ -14,10 +14,10 @@ public class EnvironmentController : EnvControllerBase
 		buildOptions = options.Value;
 	}
 
-	protected override Task<GetInfoActionResult> GetInfo()
+	protected override Task<GetEnvironmentInfoActionResult> GetEnvironmentInfo()
 	{
 		return Task.FromResult(
-			GetInfoActionResult.Ok(new(buildOptions.GitHash, buildOptions.Tag))
+			GetEnvironmentInfoActionResult.Ok(new(buildOptions.GitHash, buildOptions.Tag))
 		);
 	}
 }
