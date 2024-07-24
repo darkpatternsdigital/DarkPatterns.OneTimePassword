@@ -32,6 +32,6 @@
 			<Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
 		</Exec>
 		<Message Condition="'$(ErrorCode)' != '0'" Text="The docker runtime was not started." />
-			<Exec WorkingDirectory="$(SolutionRoot)/eng/db" Command="docker-compose up -d" ContinueOnError="true" Condition="'$(ErrorCode)' == '0'" />
+			<Exec WorkingDirectory="$(SolutionRoot)/eng/psql" Command="docker-compose up -d" ContinueOnError="true" Condition="'$(ErrorCode)' == '0'" />
 	</Target>
 </Project>
