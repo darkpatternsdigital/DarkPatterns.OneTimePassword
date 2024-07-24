@@ -1,6 +1,7 @@
 
 
 
+using DarkPatterns.OneTimePassword.Auth;
 using DarkPatterns.OneTimePassword.Delivery;
 using DarkPatterns.OneTimePassword.Persistence;
 
@@ -16,11 +17,14 @@ public class OtpVerifyController(
 		var deliveryMethod = deliveryMethodFactory.Create(verifyOtpBody.Medium);
 		if (!deliveryMethod.IsValidDestination(verifyOtpBody.Destination))
 			return VerifyOtpActionResult.BadRequest();
+		if (!User.TryGetApplicationId(out var appId))
+			return VerifyOtpActionResult.BadRequest();
 
-		bool verifyResult = await db.VerifyOtpAsync(
+		var verifyResult = await db.VerifyOtpAsync(
 			verifyOtpBody.Medium,
 			verifyOtpBody.Destination,
-			verifyOtpBody.Otp
+			verifyOtpBody.Otp,
+			applicationId: appId
 		);
 
 		if (verifyResult)

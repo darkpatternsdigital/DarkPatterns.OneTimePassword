@@ -11,6 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
+using Moq;
+
 namespace DarkPatterns.OneTimePassword.TestUtils;
 
 internal static class BaseWebApplicationFactory
@@ -27,6 +29,27 @@ internal static class BaseWebApplicationFactory
 
 				web.UseEnvironment("Testing");
 			});
+	}
+
+	internal static WebApplicationFactory<Program> WithTime(
+		this WebApplicationFactory<Program> factory,
+		DateTimeOffset time,
+		out Mock<TimeProvider> mockTimeProvider
+	)
+	{
+		mockTimeProvider = new Mock<TimeProvider>();
+		mockTimeProvider.Setup(tp => tp.GetUtcNow()).Returns(time);
+		var timeProvider = mockTimeProvider.Object;
+		var resultFactory = factory
+			.WithWebHostBuilder(web =>
+			{
+				web.ConfigureTestServices(svc =>
+				{
+					svc.AddSingleton(timeProvider);
+				});
+			});
+
+		return resultFactory;
 	}
 
 	internal static WebApplicationFactory<Program> WithDatabase(
@@ -51,6 +74,27 @@ internal static class BaseWebApplicationFactory
 		db.Database.EnsureCreated();
 
 		return resultFactory;
+	}
+
+	internal static WebApplicationFactory<Program> AddAppConfiguration(
+		this WebApplicationFactory<Program> factory,
+		DbFixture fixture,
+		Guid applicationId,
+		OtpConfiguration configuration
+	)
+	{
+
+		using var db = new OtpDbContext(fixture.ContextOptions);
+		if (db.Applications.Find(applicationId) == null)
+			db.Applications.Add(new()
+			{
+				ApplicationId = applicationId,
+			});
+		db.Configurations.Add(configuration);
+		db.ConfiguredApplications.Add(new() { ApplicationId = applicationId, ConfigurationId = configuration.ConfigurationId });
+		db.SaveChanges();
+
+		return factory;
 	}
 
 	internal static HttpClient CreateApiClient(this WebApplicationFactory<Program> factory, string? apiKey)

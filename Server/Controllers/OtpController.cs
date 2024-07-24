@@ -1,5 +1,7 @@
 
 
+using DarkPatterns.OneTimePassword.Auth;
+using DarkPatterns.OneTimePassword.Commands;
 using DarkPatterns.OneTimePassword.Delivery;
 using DarkPatterns.OneTimePassword.Logic;
 using DarkPatterns.OneTimePassword.Persistence;
@@ -8,8 +10,7 @@ namespace DarkPatterns.OneTimePassword.Controllers;
 
 public class OtpController(
 	IDeliveryMethodFactory deliveryMethodFactory,
-	IOtpGenerator otpGenerator,
-	OtpDbContext db
+	IOtpGenerator otpGenerator
 ) : OtpControllerBase
 {
 	protected override async Task<SendOtpActionResult> SendOtp(SendOtpRequest sendOtpBody)
@@ -24,7 +25,13 @@ public class OtpController(
 		if (!success)
 			return SendOtpActionResult.BadRequest();
 
-		await db.PersistOtpAsync(sendOtpBody.Medium, sendOtpBody.Destination, otp);
+		if (!User.TryGetApplicationId(out var applicationId))
+			return SendOtpActionResult.BadRequest();
+
+		var config = await new GetConfigurationCommand().Execute(HttpContext);
+		if (config == null)
+			return SendOtpActionResult.BadRequest();
+		await new PersistOtpCommand(sendOtpBody.Medium, sendOtpBody.Destination, otp, applicationId, config).Execute(HttpContext);
 
 		return SendOtpActionResult.Created();
 	}

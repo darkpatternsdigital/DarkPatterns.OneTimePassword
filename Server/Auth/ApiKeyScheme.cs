@@ -6,13 +6,14 @@ using System.Text.Encodings.Web;
 using DarkPatterns.OneTimePassword.Persistence;
 
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace DarkPatterns.OneTimePassword.Auth;
 
 public class ApiKeyScheme : AuthenticationHandler<ApiKeyOptions>
 {
-	private const string apiKeyHeaderName = "x-api-key";
+	public const string ApiKeyHeaderName = "x-api-key";
 
 	public ApiKeyScheme(IOptionsMonitor<ApiKeyOptions> options, ILoggerFactory logger, UrlEncoder encoder) : base(options, logger, encoder)
 	{
@@ -20,7 +21,7 @@ public class ApiKeyScheme : AuthenticationHandler<ApiKeyOptions>
 
 	protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
 	{
-		if (!Context.Request.Headers.TryGetValue(apiKeyHeaderName, out var headers))
+		if (!Context.Request.Headers.TryGetValue(ApiKeyHeaderName, out var headers))
 			return AuthenticateResult.Fail("x-api-key header must be provided");
 		var parsed = headers is [string apiKey] ? ApiKeyTools.ParseApiKey(apiKey) : null;
 		if (parsed == null)
@@ -28,8 +29,9 @@ public class ApiKeyScheme : AuthenticationHandler<ApiKeyOptions>
 		var (appId, configId) = parsed;
 
 		var dbContext = Context.RequestServices.GetRequiredService<OtpDbContext>();
-		// TODO - verify API Key exists in dbContext
-		await Task.Yield();
+		var hasApp = await dbContext.ConfiguredApplications.FirstOrDefaultAsync(cfgApp => cfgApp.ApplicationId == appId && cfgApp.ConfigurationId == configId);
+		if (hasApp == null)
+			return AuthenticateResult.Fail("Invalid API Key");
 
 		var ticket = new AuthenticationTicket(
 			new ClaimsPrincipal(

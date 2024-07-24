@@ -9,4 +9,4 @@ param(
 # Launches the "psql" command in the terminal with a connection to the
 # docker-compose postgres db instance
 
-docker exec -ti db-db-1 psql -U $user -d $database @Args
+docker exec -ti dpd-otp-db-1 psql -U $user -d $database @Args

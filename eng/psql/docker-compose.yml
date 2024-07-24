@@ -1,4 +1,5 @@
 version: '3.3'
+name: dpd-otp
 services:
   db:
     image: postgres:15.3-alpine
