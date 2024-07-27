@@ -15,7 +15,6 @@ public class OtpController(
 {
 	protected override async Task<SendOtpActionResult> SendOtp(SendOtpRequest sendOtpBody)
 	{
-		// TODO: get API Key details for otp persistence configuration
 		var deliveryMethod = deliveryMethodFactory.Create(sendOtpBody.Medium);
 		if (!deliveryMethod.IsValidDestination(sendOtpBody.Destination))
 			return SendOtpActionResult.BadRequest();

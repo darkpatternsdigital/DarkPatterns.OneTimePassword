@@ -31,7 +31,7 @@ public class PersistOtpCommand(Medium medium, string destination, string otp, Gu
 				ApplicationId = applicationId,
 				MediumCode = medium.ToMediumCode(),
 				DeliveryTarget = destination,
-				PasswordHash = PasswordHashing.GeneratePasswordHash(otp),
+				PasswordHash = newPasswordHash,
 				ExpirationTime = expiration,
 				RemainingCount = configuration.MaxAttemptCount,
 			});
