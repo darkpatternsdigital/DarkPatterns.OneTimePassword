@@ -8,8 +8,7 @@ using DarkPatterns.OneTimePassword.Persistence;
 namespace DarkPatterns.OneTimePassword.Controllers;
 
 public class OtpVerifyController(
-	IDeliveryMethodFactory deliveryMethodFactory,
-	OtpDbContext db
+	IDeliveryMethodFactory deliveryMethodFactory
 ) : OtpVerifyControllerBase
 {
 	protected override async Task<VerifyOtpActionResult> VerifyOtp(VerifyOtpRequest verifyOtpBody)
@@ -20,12 +19,12 @@ public class OtpVerifyController(
 		if (!User.TryGetApplicationId(out var appId))
 			return VerifyOtpActionResult.BadRequest();
 
-		var verifyResult = await db.VerifyOtpAsync(
+		var verifyResult = await new VerifyOtpCommand(
 			verifyOtpBody.Medium,
 			verifyOtpBody.Destination,
 			verifyOtpBody.Otp,
 			applicationId: appId
-		);
+		).Execute(HttpContext);
 
 		if (verifyResult)
 			return VerifyOtpActionResult.Ok();
