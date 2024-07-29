@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DarkPatterns.OneTimePassword.Persistence;
 
-public class VerifyOtpCommand(Medium medium, string destination, string otp, Guid applicationId) : ICommand<Task<bool>, HttpContext>
+public class VerifyOtpCommand(Medium medium, string destination, string otp, Guid applicationId, OtpConfiguration config) : ICommand<Task<bool>, HttpContext>
 {
 	public async Task<bool> Execute(HttpContext context)
 	{
@@ -32,10 +32,13 @@ public class VerifyOtpCommand(Medium medium, string destination, string otp, Gui
 				db.Remove(deliveredRecord);
 				return true;
 			}
-			else
-			{
-				return false;
-			}
+
+			deliveredRecord.RemainingCount--;
+			if (deliveredRecord.RemainingCount == 0)
+				db.Remove(deliveredRecord);
+			else if (config.IsSliding)
+				deliveredRecord.ExpirationTime = timeProvider.GetUtcNow() + config.ExpirationWindow;
+			return false;
 		}
 		finally
 		{

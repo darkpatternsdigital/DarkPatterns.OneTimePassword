@@ -19,11 +19,16 @@ public class OtpVerifyController(
 		if (!User.TryGetApplicationId(out var appId))
 			return VerifyOtpActionResult.BadRequest();
 
+		var config = await new GetConfigurationCommand().Execute(HttpContext);
+		if (config == null)
+			return VerifyOtpActionResult.BadRequest();
+
 		var verifyResult = await new VerifyOtpCommand(
 			verifyOtpBody.Medium,
 			verifyOtpBody.Destination,
 			verifyOtpBody.Otp,
-			applicationId: appId
+			applicationId: appId,
+			config: config
 		).Execute(HttpContext);
 
 		if (verifyResult)
