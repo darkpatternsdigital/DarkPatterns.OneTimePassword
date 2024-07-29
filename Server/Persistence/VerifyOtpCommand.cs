@@ -10,6 +10,7 @@ public class VerifyOtpCommand(Medium medium, string destination, string otp, Gui
 	public async Task<bool> Execute(HttpContext context)
 	{
 		var db = context.RequestServices.GetRequiredService<OtpDbContext>();
+		var timeProvider = context.RequestServices.GetRequiredService<TimeProvider>();
 		var deliveredRecord = await db.DeliveredPasswords.FirstOrDefaultAsync(
 			x => x.ApplicationId == applicationId
 			&& x.MediumCode == medium.ToMediumCode()
@@ -17,16 +18,28 @@ public class VerifyOtpCommand(Medium medium, string destination, string otp, Gui
 		);
 		if (deliveredRecord == null)
 			return false;
-		var isMatch = PasswordHashing.VerifyHash(deliveredRecord.PasswordHash, otp);
-		if (isMatch)
+		try
 		{
-			db.Remove(deliveredRecord);
-			await db.SaveChangesAsync();
-			return true;
+			if (deliveredRecord.ExpirationTime <= timeProvider.GetUtcNow())
+			{
+				db.Remove(deliveredRecord);
+				return false;
+			}
+
+			var isMatch = PasswordHashing.VerifyHash(deliveredRecord.PasswordHash, otp);
+			if (isMatch)
+			{
+				db.Remove(deliveredRecord);
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
-		else
+		finally
 		{
-			return false;
+			await db.SaveChangesAsync();
 		}
 	}
 }
