@@ -13,6 +13,7 @@ public static class ServiceRegistration
 		services.AddHealthChecks();
 		services.AddControllers(config =>
 		{
+			config.Filters.Add(new ModelStateValidationFilter());
 		});
 		services.Configure<ForwardedHeadersOptions>(options =>
 		{
